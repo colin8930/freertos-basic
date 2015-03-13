@@ -115,7 +115,7 @@ static int romfs_ls(void * opaque, const char * path) {
         if (get_unaligned(meta+8) == h) {		//hash_path position
             char name[256];
             for(int i =0; i<256; i++){
-                *(name+i) = *(meta+12+i);
+                if(!(*(name+i) = *(meta+12+i))) break;
             }
             fio_printf(1, name);
             fio_printf(1, "\r\n");
