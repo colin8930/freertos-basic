@@ -24,6 +24,7 @@ void help_command(int, char **);
 void host_command(int, char **);
 void mmtest_command(int, char **);
 void test_command(int, char **);
+void new_command(int, char **);
 void _command(int, char **);
 
 #define MKCL(n, d) {.name=#n, .fptr=n ## _command, .desc=d}
@@ -37,6 +38,7 @@ cmdlist cl[]={
 	MKCL(mmtest, "heap memory allocation test"),
 	MKCL(help, "help"),
 	MKCL(test, "test new function"),
+	MKCL(new, "create new task"),
 	MKCL(, ""),
 };
 
@@ -64,16 +66,18 @@ int parse_command(char *str, char *argv[]){
 void ls_command(int n, char *argv[]){
     fio_printf(1,"\r\n"); 
     int dir;
-    if(n == 0){
+    if(n == 1){
         dir = fs_opendir("");
-    }else if(n == 1){
+    }else if(n == 2){
         dir = fs_opendir(argv[1]);
-        //if(dir == )
+        if(dir == -2) fio_printf(1, "error\r\n");
+        if(dir == -1) fio_printf(1, "error\r\n");
     }else{
         fio_printf(1, "Too many argument!\r\n");
         return;
     }
-(void)dir;   // Use dir
+    
+    (void) dir;
 }
 
 int filedump(const char *filename){
@@ -184,6 +188,34 @@ void test_command(int n, char *argv[]) {
     }
 
     host_action(SYS_CLOSE, handle);
+}
+
+void blank_task(void *pvParameters)
+{
+	while(1);	
+}
+
+void new_command(int n, char *argv[]){
+	
+    int new = 0;
+    fio_printf(1, "\r\n");
+    while(*(argv[1]++)) new=new*10+(*(argv[1]-1))-48;
+
+    for(int i = 0; i < new; i++){
+        if(xTaskCreate(blank_task,
+                    (signed portCHAR *) "blank",
+                    512 /* stack size */, NULL, tskIDLE_PRIORITY + 1, NULL) == errCOULD_NOT_ALLOCATE_REQUIRED_MEMORY) {
+                        char str[3];
+                        sprintf(str, "%d", i);
+                        fio_printf(1, str);
+                        fio_printf(1, " tasks are created successfully\r\n");
+                        sprintf(str, "%d", new - i);
+                        fio_printf(1, str);
+                        fio_printf(1, " task(s) can't not be created \r\n");
+                        break;
+                    }
+    }
+    fio_printf(1, "\r\n");
 }
 
 void _command(int n, char *argv[]){
