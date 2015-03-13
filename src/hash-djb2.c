@@ -13,3 +13,14 @@ uint32_t hash_djb2(const uint8_t * str, ssize_t _max) {
     
     return hash;
 }
+
+uint32_t hash_path_djb2(const uint8_t * str, uint32_t hash) {
+    
+    int c;
+    
+    while (((c = *str++))) {
+        hash = ((hash << 5) + hash) ^ c;
+    }
+    
+    return hash;
+}
