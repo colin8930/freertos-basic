@@ -24,6 +24,7 @@ void help_command(int, char **);
 void host_command(int, char **);
 void mmtest_command(int, char **);
 void test_command(int, char **);
+void tasktest_command(int, char**);
 void new_command(int, char **);
 void _command(int, char **);
 
@@ -39,6 +40,7 @@ cmdlist cl[]={
 	MKCL(help, "help"),
 	MKCL(test, "test new function"),
 	MKCL(new, "create new task"),
+	MKCL(tasktest, "create new task"),
 	MKCL(, ""),
 };
 
