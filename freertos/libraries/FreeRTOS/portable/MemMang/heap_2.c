@@ -114,7 +114,15 @@ static xBlockLink xStart, xEnd;
 /* Keeps track of the number of free bytes remaining, but says nothing about
 fragmentation. */
 static size_t xFreeBytesRemaining = configTOTAL_HEAP_SIZE;
+xBlockLink xEndGet()
+{
+	return xEnd;
+}
 
+xBlockLink xStartSizeGet()
+{
+	return xStart;
+}
 /* STATIC FUNCTIONS ARE DEFINED AS MACROS TO MINIMIZE THE FUNCTION CALL DEPTH. */
 
 /*

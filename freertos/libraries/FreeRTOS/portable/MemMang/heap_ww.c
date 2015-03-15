@@ -101,12 +101,21 @@ static const unsigned short heapSTRUCT_SIZE = ( sizeof( xBlockLink ) + portBYTE_
 #define heapMINIMUM_BLOCK_SIZE  ( ( size_t ) ( heapSTRUCT_SIZE * 2 ) )
 
 /* Create a couple of list links to mark the start and end of the list. */
-static xBlockLink xStartSize, xEnd;  /* xEnd must follow heap in physical memory */
-
+static xBlockLink xEnd;  /* xEnd must follow heap in physical memory */
+static xBlockLink xStartSize;  /* xEnd must follow heap in physical memory */
 /* Keeps track of the number of free bytes remaining, but says nothing about
    fragmentation. */
 static size_t xFreeBytesRemaining = configTOTAL_HEAP_SIZE;
 
+xBlockLink xEndGet()
+{
+	return xEnd;
+}
+
+xBlockLink xStartSizeGet()
+{
+	return xStartSize;
+}
 /* STATIC FUNCTIONS ARE DEFINED AS MACROS TO MINIMIZE THE FUNCTION CALL DEPTH. */
 
 /*

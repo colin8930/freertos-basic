@@ -7,7 +7,6 @@ CFLAGS = -fno-common -O0 \
 	 -std=c99 -pedantic \
 	 -gdwarf-2 -ffreestanding -g3 \
 	 -mcpu=cortex-m3 -mthumb \
-	 -Wall -Werror \
 	 -Tmain.ld -nostartfiles \
 	 -DUSER_NAME=\"$(USER)\"
 
@@ -43,7 +42,7 @@ DATDIR = data
 TOOLDIR = tool
 TMPDiR = output
 
-HEAP_IMPL = heap_ww
+HEAP_IMPL = heap_2
 SRC = $(wildcard $(addsuffix /*.c,$(SRCDIR))) \
       $(wildcard $(addsuffix /*.s,$(SRCDIR))) \
       $(FREERTOS_SRC)/portable/MemMang/$(HEAP_IMPL).c \
