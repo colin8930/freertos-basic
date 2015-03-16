@@ -125,7 +125,22 @@ static int romfs_ls(void * opaque, const char * path) {
 	return r;
 }
 
+static int romfs_check(void * opaque, const char * path) {
+    uint32_t h = hash_djb2((const uint8_t *) path, -1);
+    const uint8_t * romfs = (const uint8_t *) opaque;
+
+	
+    const uint8_t * meta;
+
+    for (meta = romfs; get_unaligned(meta) && get_unaligned(meta + 4); meta += get_unaligned(meta + 4) + 12) {
+        if (get_unaligned(meta+8) == h) {		//hash_path position
+            return 1;
+        }
+    }
+    return 0;
+}
+
 void register_romfs(const char * mountpoint, const uint8_t * romfs) {
 //    DBGOUT("Registering romfs `%s' @ %p\r\n", mountpoint, romfs);
-    register_fs(mountpoint, romfs_open, romfs_ls, (void *) romfs);
+    register_fs(mountpoint, romfs_open, romfs_ls, romfs_check, (void *) romfs);
 }

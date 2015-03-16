@@ -26,6 +26,8 @@ void mmtest_command(int, char **);
 void test_command(int, char **);
 void tasktest_command(int, char**);
 void new_command(int, char **);
+void cd_command(int, char **);
+void pwd_command(int, char **);
 void _command(int, char **);
 
 #define MKCL(n, d) {.name=#n, .fptr=n ## _command, .desc=d}
@@ -42,6 +44,8 @@ cmdlist cl[]={
 	MKCL(test, "test new function"),
 	MKCL(new, "create new task"),
 	MKCL(tasktest, "create new task"),
+	MKCL(cd, "change the current dir"),
+	MKCL(pwd, "show the current working dir"),
 	MKCL(, ""),
 };
 
@@ -73,6 +77,8 @@ void ls_command(int n, char *argv[]){
     int dir;
     if(n == 1){
         dir = fs_opendir(pwd);
+        if(dir == -2) fio_printf(1, "error\r\n");
+        if(dir == -1) fio_printf(1, "error\r\n");
     }else if(n == 2){
         char path[20] = "";
         strcpy(path, pwd);		
@@ -228,6 +234,43 @@ void new_command(int n, char *argv[]){
 
 void _command(int n, char *argv[]){
     (void)n; (void)argv;
+    fio_printf(1, "\r\n");
+}
+
+void pwd_command(int n, char *argv[]){
+
+    if(n == 1 ) {
+        fio_printf(1, pwd);
+        fio_printf(1, "/r/n");
+    }
+    else fio_printf(1, "Too many argument!\r\n");
+
+}
+
+void cd_command(int n, char *argv[]){
+	
+    int dir;
+    if(n == 1) strcpy(pwd, "/romfs");  //go to home
+    else if(n == 2){
+        if(strcmp(argv[1], ".." ) == 0){			
+            if(strcmp(pwd, "/romfs/") == 0) ;//do nothings
+            else {
+                int len = strlen(pwd) - 2; //find the lash slash				
+                while(pwd[len--] != '/' );
+                char tmp[30] = "";
+                memcpy(tmp, pwd, len+2);		
+                strcpy(pwd, tmp);			
+                }
+        }	else{
+                char path[20] = "/romfs/";
+                strcat(path, argv[1]) ;
+                dir = fs_checkdir(path);
+                if(dir == -2 || dir == -1) fio_printf(1, "error\r\n");
+                else strcpy(pwd, path);
+        }
+    }
+    else fio_printf(1, "Too many argument!\r\n");
+
     fio_printf(1, "\r\n");
 }
 

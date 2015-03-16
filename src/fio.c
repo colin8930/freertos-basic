@@ -236,5 +236,5 @@ static int devfs_open_dir(void * opaque, const char * path){
 
 void register_devfs() {
     DBGOUT("Registering devfs.\r\n");
-    register_fs("dev", devfs_open, devfs_open_dir, NULL);
+    register_fs("dev", devfs_open, devfs_open_dir, NULL, NULL);
 }

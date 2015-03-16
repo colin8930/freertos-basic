@@ -12,12 +12,12 @@
 
 typedef int (*fs_open_t)(void * opaque, const char * fname, int flags, int mode);
 typedef int (*fs_open_dir_t)(void * opaque, const char * fname);
-
+typedef int (*fs_check_dir_t)(void * opaque, const char * fname);
 /* Need to be called before using any other fs functions */
 __attribute__((constructor)) void fs_init();
 
-int register_fs(const char * mountpoint, fs_open_t callback, fs_open_dir_t dir_callback, void * opaque);
+int register_fs(const char * mountpoint, fs_open_t callback, fs_open_dir_t dir_callback, fs_check_dir_t check_callback, void * opaque);
 int fs_open(const char * path, int flags, int mode);
 int fs_opendir(const char * path);
-
+int fs_checkdir(const char * path);
 #endif
