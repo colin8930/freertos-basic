@@ -29,6 +29,7 @@ void new_command(int, char **);
 void _command(int, char **);
 
 #define MKCL(n, d) {.name=#n, .fptr=n ## _command, .desc=d}
+char pwd[20] = "/romfs/"; //current  directory
 
 cmdlist cl[]={
 	MKCL(ls, "List directory"),
@@ -43,6 +44,8 @@ cmdlist cl[]={
 	MKCL(tasktest, "create new task"),
 	MKCL(, ""),
 };
+
+
 
 int parse_command(char *str, char *argv[]){
 	int b_quote=0, b_dbquote=0;
@@ -62,16 +65,19 @@ int parse_command(char *str, char *argv[]){
 	/* last one */
 	argv[count++]=&str[p];
 
-	return count;
+ return count;
 }
 
 void ls_command(int n, char *argv[]){
     fio_printf(1,"\r\n"); 
     int dir;
     if(n == 1){
-        dir = fs_opendir("");
+        dir = fs_opendir(pwd);
     }else if(n == 2){
-        dir = fs_opendir(argv[1]);
+        char path[20] = "";
+        strcpy(path, pwd);		
+        strcat(path, argv[1]) ;
+        dir = fs_opendir(path);
         if(dir == -2) fio_printf(1, "error\r\n");
         if(dir == -1) fio_printf(1, "error\r\n");
     }else{
