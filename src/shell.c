@@ -241,7 +241,7 @@ void pwd_command(int n, char *argv[]){
 
     if(n == 1 ) {
         fio_printf(1, pwd);
-        fio_printf(1, "/r/n");
+        fio_printf(1, "\r\n");
     }
     else fio_printf(1, "Too many argument!\r\n");
 
