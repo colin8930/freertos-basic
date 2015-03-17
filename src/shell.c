@@ -240,6 +240,7 @@ void _command(int n, char *argv[]){
 void pwd_command(int n, char *argv[]){
 
     if(n == 1 ) {
+		fio_printf(1, "\r\n");
         fio_printf(1, pwd);
         fio_printf(1, "\r\n");
     }
