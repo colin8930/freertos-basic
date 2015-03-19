@@ -31,7 +31,7 @@ void pwd_command(int, char **);
 void _command(int, char **);
 
 #define MKCL(n, d) {.name=#n, .fptr=n ## _command, .desc=d}
-extern char pwd[20];
+extern char pwd[];
 
 cmdlist cl[]={
 	MKCL(ls, "List directory"),

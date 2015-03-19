@@ -7,17 +7,17 @@
 #include "filesystem.h"
 #include "osdebug.h"
 #include "hash-djb2.h"
-
+#include "shell.h"
 static struct fddef_t fio_fds[MAX_FDS];
-extern char pwd[20]; //current  directory
+extern char pwd[]; //current  directory
 /* recv_byte is define in main.c */
 char recv_byte();
 void send_byte(char);
-
+extern char pwd[20];
 enum KeyName{ESC=27, BACKSPACE=127};
 
 /* Imple */
-static ssize_t stdin_read(void * opaque, void * buf, size_t count) {
+static ssize_t stdin_read(void * opaque, void * buf, size_t count, char *argv[]) {
     int i=0, endofline=0, last_chr_is_esc;
     char *ptrbuf=buf;
     char ch;
@@ -47,10 +47,57 @@ static ssize_t stdin_read(void * opaque, void * buf, size_t count) {
 				send_byte('\b');
 				send_byte(' ');
 				send_byte('\b');
+				ptrbuf[i]='\0';
 				--i;
+				ptrbuf[i]='\0';
 			}
+			continue;
 		case '\t':			//auto completion
-			
+			{
+				char *argv_tmp[50];
+				ptrbuf[i] = '\0';
+				int n=parse_command(ptrbuf, argv_tmp);  //check the command
+				if(n == 1) ; //do nothing
+				else{	//only for cd cat ls
+					if(strcmp(argv_tmp[0], "cd") == 0 ||strcmp(argv_tmp[0], "ls") == 0 ){  //find directory
+						char last[30]="";
+						char* tmp;
+						char cmd[10] ="";
+						memcpy(cmd, argv_tmp[0], strlen(argv_tmp[0]));
+						tmp = strrchr(argv_tmp[1], '/');
+						memcpy(last, tmp, strlen(tmp));
+					
+						char path[30] = "";
+						char* get;
+						char full_path[30] = "";
+						if(strcmp(last, "") == 0) {
+							memcpy(last, argv_tmp[1], strlen(argv_tmp[1]));
+							memcpy(full_path, pwd, strlen(pwd));
+							get = fs_find(full_path, last, 0);
+						}
+						else {
+							memcpy(path, argv_tmp[1], tmp - argv_tmp[1]);
+							strcat(path, "/");
+							memcpy(full_path, pwd, strlen(pwd));
+							strcat(full_path, path);
+							get = fs_find(full_path, last+1, 0);
+						}
+						if(strcmp(get, "") == 0) continue;
+						else {
+							char tmp2[30] = "";
+							strcat(tmp2, cmd);
+							strcat(tmp2, " ");
+							if(strcmp(path, "") != 0) strcat(tmp2, path);						
+							strcat(tmp2, get);
+							buf = tmp2;
+							ptrbuf = buf;
+							i = strlen(buf);
+							if(strcmp(path, "") == 0) fio_printf(1, get + strlen(last));
+							else fio_printf(1, get + strlen(last+1));
+						}
+					}				
+				}
+			}			
 			continue;
 		default:
 			last_chr_is_esc=0;
@@ -238,5 +285,5 @@ static int devfs_open_dir(void * opaque, const char * path){
 
 void register_devfs() {
     DBGOUT("Registering devfs.\r\n");
-    register_fs("dev", devfs_open, devfs_open_dir, NULL, NULL);
+    register_fs("dev", devfs_open, devfs_open_dir, NULL, NULL, NULL);
 }

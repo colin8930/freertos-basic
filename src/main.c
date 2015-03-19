@@ -21,7 +21,7 @@
  * it contains file system structure of test_romfs directory
  */
 extern const unsigned char _sromfs;
-char pwd[20] = "/romfs/"; //current  directory
+char pwd[] = "/romfs/"; //current  directory
 //static void setup_hardware();
 
 volatile xSemaphoreHandle serial_tx_wait_sem = NULL;
@@ -93,7 +93,7 @@ void command_prompt(void *pvParameters)
 
 	fio_printf(1, "\rWelcome to FreeRTOS Shell\r\n");
 	while(1){
-                fio_printf(1, "%s", hint);
+        fio_printf(1, "%s", hint);
 		fio_read(0, buf, 127);
 	
 		int n=parse_command(buf, argv);

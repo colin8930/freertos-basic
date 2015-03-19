@@ -52,8 +52,7 @@ void processdir(DIR * dirp, const char * curpath, FILE * outfile, const char * p
             if (strcmp(ent->d_name, "..") == 0)
                 continue;
             strcat(fullpath, "/");
-            rec_dirp = opendir(fullpath);
-            processdir(rec_dirp, fullpath + strlen(prefix) + 1, outfile, prefix);
+            rec_dirp = opendir(fullpath);            
             //record the directory path hash
 			hash = hash_djb2((const uint8_t *) ent->d_name, cur_hash);
             b = (hash >>  0) & 0xff; fwrite(&b, 1, 1, outfile);
@@ -75,7 +74,7 @@ void processdir(DIR * dirp, const char * curpath, FILE * outfile, const char * p
             b = (cur_hash >> 24) & 0xff; fwrite(&b, 1, 1, outfile);
             fwrite(ent->d_name,strlen(ent->d_name),1,outfile);
             b = 0;fwrite(&b,1,1,outfile);
-            
+            processdir(rec_dirp, fullpath + strlen(prefix) + 1, outfile, prefix);
             closedir(rec_dirp);
         } else {
             hash = hash_djb2((const uint8_t *) ent->d_name, cur_hash);

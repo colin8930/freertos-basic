@@ -13,6 +13,7 @@ struct fs_t {
     fs_open_t cb;
     fs_open_dir_t dcb;
     fs_check_dir_t ccb;
+    fs_find_t fcb;
     void * opaque;
 };
 
@@ -22,7 +23,7 @@ __attribute__((constructor)) void fs_init() {
     memset(fss, 0, sizeof(fss));
 }
 
-int register_fs(const char * mountpoint, fs_open_t callback, fs_open_dir_t dir_callback, fs_check_dir_t check_callback , void * opaque) {
+int register_fs(const char * mountpoint, fs_open_t callback, fs_open_dir_t dir_callback, fs_check_dir_t check_callback, fs_find_t find_callback, void * opaque) {
     int i;
     DBGOUT("register_fs(\"%s\", %p, %p, %p)\r\n", mountpoint, callback, dir_callback, opaque);
     
@@ -32,6 +33,7 @@ int register_fs(const char * mountpoint, fs_open_t callback, fs_open_dir_t dir_c
             fss[i].cb = callback;
             fss[i].dcb = dir_callback;
             fss[i].ccb = check_callback;
+            fss[i].fcb = find_callback;
             fss[i].opaque = opaque;
             return 0;
         }
@@ -129,5 +131,36 @@ int fs_checkdir(const char * path){
     }    
 
     return -1;
+}
+
+char* fs_find(const char * path, const char * finding, int type){
+    const char * slash;
+    uint32_t hash;
+    
+    if ( path[0] == '\0' || (path[0] == '/' && path[1] == '\0') ){
+        return root_opendir();
+    }
+    
+    while (path[0] == '/')
+        path++;
+    
+    slash = strchr(path, '/');
+    if (!slash)
+        slash = path + strlen(path);
+
+    hash = hash_djb2((const uint8_t *) path, slash - path);
+    
+    if(*(slash) == '\0'){
+        path = "";
+    }else{
+        path = slash + 1;
+    }
+    
+    for (int i = 0; i < MAX_FS; i++) {
+        if (fss[i].hash == hash)
+            return fss[i].fcb(fss[i].opaque, path, finding, type);
+    }    
+
+    return "";
 }
 
