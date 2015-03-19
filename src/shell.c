@@ -129,11 +129,16 @@ void cat_command(int n, char *argv[]){
 		return;
 	}
 
-    int dump_status = filedump(argv[1]);
+    
+    char path[30] = "";
+    strcpy(path, pwd);
+    strcat(path, argv[1]);
+    
+    int dump_status = filedump(path);
 	if(dump_status == -1){
-		fio_printf(2, "\r\n%s : no such file or directory.\r\n", argv[1]);
+		fio_printf(2, "\r\n%s : no such file or directory.\r\n", path);
     }else if(dump_status == -2){
-		fio_printf(2, "\r\nFile system not registered.\r\n", argv[1]);
+		fio_printf(2, "\r\nFile system not registered.\r\n", path);
     }
 }
 
