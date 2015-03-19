@@ -9,6 +9,8 @@
 #include <string.h>
 
 #define hash_init 5381
+#define TYPE_DIR 0xFFFF
+#define TYPE_FILE 0x0000
 
 uint32_t hash_djb2(const uint8_t * str, uint32_t hash) {
     int c;
@@ -33,6 +35,7 @@ void processdir(DIR * dirp, const char * curpath, FILE * outfile, const char * p
     uint32_t size, w, hash;
     uint8_t b;
     FILE * infile;
+    uint32_t type;
 
     while ((ent = readdir(dirp))) {
         strcpy(fullpath, prefix);
@@ -51,6 +54,28 @@ void processdir(DIR * dirp, const char * curpath, FILE * outfile, const char * p
             strcat(fullpath, "/");
             rec_dirp = opendir(fullpath);
             processdir(rec_dirp, fullpath + strlen(prefix) + 1, outfile, prefix);
+            //record the directory path hash
+			hash = hash_djb2((const uint8_t *) ent->d_name, cur_hash);
+            b = (hash >>  0) & 0xff; fwrite(&b, 1, 1, outfile);
+            b = (hash >>  8) & 0xff; fwrite(&b, 1, 1, outfile);
+            b = (hash >> 16) & 0xff; fwrite(&b, 1, 1, outfile);
+            b = (hash >> 24) & 0xff; fwrite(&b, 1, 1, outfile);
+            size = strlen(ent->d_name)+1;
+            b = (size >>  0) & 0xff; fwrite(&b, 1, 1, outfile);
+            b = (size >>  8) & 0xff; fwrite(&b, 1, 1, outfile);
+            b = (size >> 16) & 0xff; fwrite(&b, 1, 1, outfile);
+            b = (size >> 24) & 0xff; fwrite(&b, 1, 1, outfile);
+            b = (TYPE_DIR >>  0) & 0xff; fwrite(&b, 1, 1, outfile);
+            b = (TYPE_DIR >>  8) & 0xff; fwrite(&b, 1, 1, outfile);
+            b = (TYPE_DIR >> 16) & 0xff; fwrite(&b, 1, 1, outfile);
+            b = (TYPE_DIR >> 24) & 0xff; fwrite(&b, 1, 1, outfile);
+            b = (cur_hash >>  0) & 0xff; fwrite(&b, 1, 1, outfile);
+            b = (cur_hash >>  8) & 0xff; fwrite(&b, 1, 1, outfile);
+            b = (cur_hash >> 16) & 0xff; fwrite(&b, 1, 1, outfile);
+            b = (cur_hash >> 24) & 0xff; fwrite(&b, 1, 1, outfile);
+            fwrite(ent->d_name,strlen(ent->d_name),1,outfile);
+            b = 0;fwrite(&b,1,1,outfile);
+            
             closedir(rec_dirp);
         } else {
             hash = hash_djb2((const uint8_t *) ent->d_name, cur_hash);
@@ -70,6 +95,10 @@ void processdir(DIR * dirp, const char * curpath, FILE * outfile, const char * p
             b = (size >>  8) & 0xff; fwrite(&b, 1, 1, outfile);
             b = (size >> 16) & 0xff; fwrite(&b, 1, 1, outfile);
             b = (size >> 24) & 0xff; fwrite(&b, 1, 1, outfile);
+            b = (TYPE_FILE >>  0) & 0xff; fwrite(&b, 1, 1, outfile);
+            b = (TYPE_FILE >>  8) & 0xff; fwrite(&b, 1, 1, outfile);
+            b = (TYPE_FILE >> 16) & 0xff; fwrite(&b, 1, 1, outfile);
+            b = (TYPE_FILE >> 24) & 0xff; fwrite(&b, 1, 1, outfile);
             b = (cur_hash >>  0) & 0xff; fwrite(&b, 1, 1, outfile);
             b = (cur_hash >>  8) & 0xff; fwrite(&b, 1, 1, outfile);
             b = (cur_hash >> 16) & 0xff; fwrite(&b, 1, 1, outfile);
