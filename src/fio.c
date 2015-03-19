@@ -89,7 +89,7 @@ static ssize_t stdin_read(void * opaque, void * buf, size_t count, char *argv[])
 							strcat(tmp2, " ");
 							if(strcmp(path, "") != 0) strcat(tmp2, path);						
 							strcat(tmp2, get);
-							buf = tmp2;
+							strcpy(buf, tmp2);
 							ptrbuf = buf;
 							i = strlen(buf);
 							if(strcmp(path, "") == 0) fio_printf(1, get + strlen(last));
