@@ -9,7 +9,7 @@
 #include "hash-djb2.h"
 
 static struct fddef_t fio_fds[MAX_FDS];
-
+extern char pwd[20]; //current  directory
 /* recv_byte is define in main.c */
 char recv_byte();
 void send_byte(char);
@@ -49,6 +49,8 @@ static ssize_t stdin_read(void * opaque, void * buf, size_t count) {
 				send_byte('\b');
 				--i;
 			}
+		case '\t':			//auto completion
+			
 			continue;
 		default:
 			last_chr_is_esc=0;

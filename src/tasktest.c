@@ -6,13 +6,13 @@
 
 typedef struct A_BLOCK_LINK
 {
-    /* for heap_ww
+    /* for heap_ww*/
     struct A_BLOCK_LINK *pxNextSizeBlock;      
     struct A_BLOCK_LINK *pxNextAddrBlock;     
-    */
     
-    /* for heap_2*/
-    struct A_BLOCK_LINK *pxNextFreeBlock;      
+    
+    /* for heap_2
+    struct A_BLOCK_LINK *pxNextFreeBlock;      */
 
     size_t xBlockSize;                          /*<< The size of the free block. */
 } xBlockLink;
@@ -47,17 +47,15 @@ void tasktest_command(int n, char *argv[]){
         vTaskPrioritySet(xIHandle, 0);
         unsigned short stacksize = prng() & 0x7F; //0~255
         if(stacksize < 48 ) stacksize+=48;
-        fio_printf(1, "try to create task %d bytes\r\n", stacksize);
+        fio_printf(1, "\n\r try to create task %d bytes\r\n", stacksize);
         if( xTaskCreate(test_task,
                 (signed portCHAR *) "test",
                 stacksize /* stack size */, NULL, tskIDLE_PRIORITY + 1, &xHandle) == errCOULD_NOT_ALLOCATE_REQUIRED_MEMORY) break;
  
-        fio_printf(1, "created successfully\r\n");
-
-        
+        fio_printf(1, "created successfully\r\n");        
 
         char tmp[80];
-        sprintf( tmp, ( char * ) "\n\r try to create a %d bytes task \n\rName          State   Priority  Stack  Num\n\r", stacksize*4);
+        sprintf( tmp, ( char * ) "\r\n\r\n\r\ncreate a %d bytes task \n\rName          State   Priority  Stack  Num", stacksize*4);
         fio_printf(1, tmp);
         host_action(SYS_WRITE, handle, (void *)tmp, strlen((const char *)tmp));
         signed char buf[1024];
@@ -69,29 +67,29 @@ void tasktest_command(int n, char *argv[]){
 
         static xBlockLink *pxBlock;
         if( stacksize % 3 == 1 ||stacksize % 3 == 2){
-            char tmp[] ="\n\r this task will be deleted \n\r";
-            host_action(SYS_WRITE, handle, (void *)tmp, strlen(tmp));
+            host_action(SYS_WRITE, handle, (void *)"\r\nthis task will be deleted, then the memory blocks will be: \n\r", strlen("this task will be deleted, then the memory blocks will be: \n\r"));
         }
+        else host_action(SYS_WRITE, handle, (void *)"the memory blocks will be: \n\r", strlen("the memory blocks will be: \n\r"));
         vTaskSuspendAll();
         {
             xstartSize = xStartSizeGet();
-			/* for heap_2*/
-            pxBlock = xstartSize.pxNextFreeBlock;
-            /* for heap_ww
-            pxBlock = xstartSize.pxNextSizeBlock;*/
+			/* for heap_2
+            pxBlock = xstartSize.pxNextFreeBlock;*/
+            /* for heap_ww*/
+            pxBlock = xstartSize.pxNextSizeBlock;
             int i = 0;
             xend = xEndGet();
-            while ( pxBlock->pxNextFreeBlock) {
+            while ( pxBlock->pxNextSizeBlock) {
 				
                 char tmp[50];
-                sprintf( tmp, ( char * ) " block %d: %d ", i,  ( unsigned int ) pxBlock->xBlockSize );
+                sprintf( tmp, ( char * ) " block %d: %d ", i, (int) pxBlock->xBlockSize );
                 fio_printf(1, tmp);
                 host_action(SYS_WRITE, handle, (void *)tmp, strlen(tmp));
                 i++;
-                /* for heap_2*/
-                pxBlock = pxBlock->pxNextFreeBlock;
-                /* for heap_ww
-                pxBlock = pxBlock->pxNextSizeBlock;*/
+                /* for heap_2
+                pxBlock = pxBlock->pxNextFreeBlock;*/
+                /* for heap_ww*/
+                pxBlock = pxBlock->pxNextSizeBlock;
             
             }
 		

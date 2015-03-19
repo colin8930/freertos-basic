@@ -111,11 +111,11 @@ static int romfs_ls(void * opaque, const char * path) {
 	
     const uint8_t * meta;
 
-    for (meta = romfs; get_unaligned(meta) && get_unaligned(meta + 4); meta += get_unaligned(meta + 4) + 12) {
-        if (get_unaligned(meta+8) == h) {		//hash_path position
+    for (meta = romfs; get_unaligned(meta) && get_unaligned(meta + 4); meta += get_unaligned(meta + 4) + 16) {
+        if (get_unaligned(meta+12) == h) {		//hash_path position
             char name[256];
             for(int i =0; i<256; i++){
-                if(!(*(name+i) = *(meta+12+i))) break;
+                if(!(*(name+i) = *(meta+16+i))) break;
             }
             fio_printf(1, name);
             fio_printf(1, "\r\n");

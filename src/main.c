@@ -21,13 +21,13 @@
  * it contains file system structure of test_romfs directory
  */
 extern const unsigned char _sromfs;
-
+char pwd[20] = "/romfs/"; //current  directory
 //static void setup_hardware();
 
 volatile xSemaphoreHandle serial_tx_wait_sem = NULL;
 /* Add for serial input */
 volatile xQueueHandle serial_rx_queue = NULL;
-
+xTaskHandle xcmdHandle = NULL;
 /* IRQ handler to handle USART2 interruptss (both transmit and receive
  * interrupts). */
 void USART2_IRQHandler()
@@ -169,7 +169,7 @@ int main()
 	/* Create a task to output text read from romfs. */
 	xTaskCreate(command_prompt,
 	            (signed portCHAR *) "CLI",
-	            512 /* stack size */, NULL, tskIDLE_PRIORITY + 2, NULL);
+	            512 /* stack size */, NULL, tskIDLE_PRIORITY + 2, &xcmdHandle);
 
 #if 0
 	/* Create a task to record system log. */
@@ -180,7 +180,7 @@ int main()
 
 	/* Start running the tasks. */
 	vTaskStartScheduler();
-
+	
 	return 0;
 }
 

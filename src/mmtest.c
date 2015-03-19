@@ -48,8 +48,8 @@ static struct slot read_cb(void)
 
 
 // Get a pseudorandom number generator from Wikipedia
-static int prng(void) __attribute__((naked));
-static int prng(void){
+int prng(void) __attribute__((naked));
+int prng(void){
 
     /*static unsigned int bit;
     // taps: 16 14 13 11; characteristic polynomial: x^16 + x^14 + x^13 + x^11 + 1 

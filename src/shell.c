@@ -31,7 +31,7 @@ void pwd_command(int, char **);
 void _command(int, char **);
 
 #define MKCL(n, d) {.name=#n, .fptr=n ## _command, .desc=d}
-char pwd[20] = "/romfs/"; //current  directory
+extern char pwd[20];
 
 cmdlist cl[]={
 	MKCL(ls, "List directory"),
@@ -77,15 +77,15 @@ void ls_command(int n, char *argv[]){
     int dir;
     if(n == 1){
         dir = fs_opendir(pwd);
-        if(dir == -2) fio_printf(1, "error\r\n");
-        if(dir == -1) fio_printf(1, "error\r\n");
+        if(dir == -2) fio_printf(1, "error1\r\n");
+        if(dir == -1) fio_printf(1, "error2\r\n");
     }else if(n == 2){
         char path[20] = "";
         strcpy(path, pwd);		
         strcat(path, argv[1]) ;
         dir = fs_opendir(path);
-        if(dir == -2) fio_printf(1, "error\r\n");
-        if(dir == -1) fio_printf(1, "error\r\n");
+        if(dir == -2) fio_printf(1, "error3\r\n");
+        if(dir == -1) fio_printf(1, "error4\r\n");
     }else{
         fio_printf(1, "Too many argument!\r\n");
         return;
