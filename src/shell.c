@@ -268,8 +268,10 @@ void cd_command(int n, char *argv[]){
                 strcpy(pwd, tmp);			
                 }
         }	else{
-                char path[20] = "/romfs/";
+                char path[30] = "";
+                memcpy(path, pwd, strlen(pwd));                
                 strcat(path, argv[1]) ;
+                if(argv[1][strlen( argv[1] ) - 1] != '/') strcat(path, "/") ;
                 dir = fs_checkdir(path);
                 if(dir == -2 || dir == -1) fio_printf(1, "error\r\n");
                 else strcpy(pwd, path);
