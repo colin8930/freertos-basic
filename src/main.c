@@ -111,7 +111,6 @@ void ps_1()
 				strcat(hint, test);
 				strcpy(test, tmp);
 			}
-			fio_printf(1,"\r\n");
 		}
 		
 		while (strcmp(test, "") != 0 && test[1]) {				
@@ -123,6 +122,10 @@ void ps_1()
 							break;
 					case 'h':
 							strcat(hint, host);
+							strcpy(test, test+2);
+							break;	
+					case 'w':
+							strcat(hint, pwd+6);
 							strcpy(test, test+2);
 							break;	
 					default:;
