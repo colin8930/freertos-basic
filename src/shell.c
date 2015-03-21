@@ -28,11 +28,12 @@ void tasktest_command(int, char**);
 void new_command(int, char **);
 void cd_command(int, char **);
 void pwd_command(int, char **);
+void ps1_command(int, char **);
 void _command(int, char **);
 
 #define MKCL(n, d) {.name=#n, .fptr=n ## _command, .desc=d}
 extern char pwd[];
-
+extern char PS1[];
 cmdlist cl[]={
 	MKCL(ls, "List directory"),
 	MKCL(man, "Show the manual of the command"),
@@ -46,6 +47,7 @@ cmdlist cl[]={
 	MKCL(tasktest, "create new task"),
 	MKCL(cd, "change the current dir"),
 	MKCL(pwd, "show the current working dir"),
+	MKCL(ps1, "change PS1"),
 	MKCL(, ""),
 };
 
@@ -253,6 +255,16 @@ void pwd_command(int n, char *argv[]){
 
 }
 
+void ps1_command(int n, char *argv[]){
+
+    if(n == 1 ) {
+        strcpy(PS1, "default");
+    }
+    else if(n == 2) strcpy(PS1, argv[1]);
+    else fio_printf(1, "Too many argument!\r\n");
+
+}
+
 void cd_command(int n, char *argv[]){
 	
     int dir;
@@ -274,7 +286,7 @@ void cd_command(int n, char *argv[]){
                 if(argv[1][strlen( argv[1] ) - 1] != '/') strcat(path, "/") ;
                 dir = fs_checkdir(path);
                 if(dir == -2 || dir == -1) fio_printf(1, "error\r\n");
-                else strcpy(pwd, path);
+                else memcpy(pwd, path, strlen(path));
         }
     }
     else fio_printf(1, "Too many argument!\r\n");

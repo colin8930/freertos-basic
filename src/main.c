@@ -21,9 +21,11 @@
  * it contains file system structure of test_romfs directory
  */
 extern const unsigned char _sromfs;
-char pwd[] = "/romfs/"; //current  directory
+char pwd[20] = "/romfs/"; //current  directory
 //static void setup_hardware();
-
+char PS1[30] = "default";
+const char user[30] =USER_NAME ;
+const char host[20] ="@"USER_NAME"-STM32:~";
 volatile xSemaphoreHandle serial_tx_wait_sem = NULL;
 /* Add for serial input */
 volatile xQueueHandle serial_rx_queue = NULL;
@@ -85,6 +87,66 @@ char recv_byte()
 	while(!xQueueReceive(serial_rx_queue, &msg, portMAX_DELAY));
 	return msg;
 }
+
+void ps_1()
+{
+	char hint[50] = "";    
+	if(strcmp(PS1, "default") == 0) {
+		strcat(hint, user);
+		strcat(hint, host);
+		strcat(hint, pwd+6);
+		strcat(hint, "$ ");
+		fio_printf(1,"\r\n");
+	} else {
+		
+		char test[30] = "";
+		strcpy(test, PS1);
+		
+		if(test[0] != '/') {
+			char* tmp;
+			if((tmp = strchr(test+1, '/')) != NULL) {
+				strncat(hint, test, tmp - test);
+				strcpy(test, tmp);
+			} else{
+				strcat(hint, test);
+				strcpy(test, tmp);
+			}
+			fio_printf(1,"\r\n");
+		}
+		
+		while (strcmp(test, "") != 0 && test[1]) {				
+				switch (test[1]) {
+					case 'u':						
+							strcat(hint, user);
+							char* tmp;
+							strcpy(test, test+2);
+							break;
+					case 'h':
+							strcat(hint, host);
+							strcpy(test, test+2);
+							break;	
+					default:;
+					{
+							char* tmp;
+							if((tmp = strchr(test+1, '/')) != NULL) {
+								strncat(hint, test, tmp - test);
+								strcpy(test, tmp);
+							} else{
+								strcat(hint, test);
+								strcpy(test, tmp);
+							}		
+						}					
+					
+					}
+				
+			}
+			fio_printf(1, "\r\n");
+
+	}
+	fio_printf(1, "%s", hint);
+	return;
+}
+
 void command_prompt(void *pvParameters)
 {
 	char buf[128];
@@ -93,10 +155,7 @@ void command_prompt(void *pvParameters)
 
 	fio_printf(1, "\rWelcome to FreeRTOS Shell\r\n");
 	while(1){
-		char hint[] = USER_NAME "@" USER_NAME "-STM32:~";
-        strcat(hint, pwd+6);
-        strcat(hint, "$ ");
-        fio_printf(1, "%s", hint);
+		ps_1();        
 		fio_read(0, buf, 127);
 	
 		int n=parse_command(buf, argv);
